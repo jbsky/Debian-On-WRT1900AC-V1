@@ -1,0 +1,62 @@
+--- drivers/mtd/ofpart.c.orig	2016-06-16 21:49:46.629464388 +0200
++++ drivers/mtd/ofpart.c.topatch	2016-06-16 22:01:00.000000000 +0200
+@@ -25,6 +25,9 @@
+ 	return of_get_property(pp, "compatible", NULL);
+ }
+ 
++static int mangled_rootblock;
++
++
+ static int parse_ofpart_partitions(struct mtd_info *master,
+ 				   const struct mtd_partition **pparts,
+ 				   struct mtd_part_parser_data *data)
+@@ -33,6 +36,7 @@
+ 	struct device_node *mtd_node;
+ 	struct device_node *ofpart_node;
+ 	const char *partname;
++	const char *owrtpart = "ubi";
+ 	struct device_node *pp;
+ 	int nr_parts, i, ret = 0;
+ 	bool dedicated = true;
+@@ -109,9 +113,17 @@
+ 		parts[i].offset = of_read_number(reg, a_cells);
+ 		parts[i].size = of_read_number(reg + a_cells, s_cells);
+ 
+-		partname = of_get_property(pp, "label", &len);
+-		if (!partname)
+-			partname = of_get_property(pp, "name", &len);
++		if (mangled_rootblock && (i == mangled_rootblock)) {
++			partname = owrtpart;
++		} 
++		else {
++			partname = of_get_property(pp, "label", &len);
++
++			if (!partname)
++				partname = of_get_property(pp, "name", &len);
++		}
++
++
+ 		parts[i].name = partname;
+ 
+ 		if (of_get_property(pp, "read-only", &len))
+@@ -214,6 +226,20 @@
+ 
+ static int __init active_root(char *str)
+ {
++	get_option(&str, &mangled_rootblock);
++
++	if (!mangled_rootblock)
++		return 1;
++
++	return 1;
++}
++
++__setup("mangled_rootblock=", active_root);
++
++
++
++static int __init active_root(char *str)
++{
+ 	get_option(&str, &mangled_rootblock);
+ 
+ 	if (!mangled_rootblock)

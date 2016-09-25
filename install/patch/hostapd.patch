@@ -1,0 +1,12 @@
+diff -r -u ./src/ap/hw_features.c ../hostapd-2.5.diff/src/ap/hw_features.c
+--- ./src/ap/hw_features.c	2016-02-20 13:32:58.900286540 +0100
++++ ../hostapd-2.5.diff/src/ap/hw_features.c	2016-02-20 13:08:51.518512802 +0100
+@@ -316,7 +316,7 @@
+ 			   iface->conf->channel,
+ 			   iface->conf->channel +
+ 			   iface->conf->secondary_channel * 4);
+-		iface->conf->secondary_channel = 0;
++		// iface->conf->secondary_channel = 0;
+ 		if (iface->drv_flags & WPA_DRIVER_FLAGS_HT_2040_COEX) {
+ 			/*
+ 			 * TODO: Could consider scheduling another scan to check

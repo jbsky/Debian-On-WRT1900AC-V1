@@ -1,0 +1,63 @@
+#!/bin/bash
+
+red='\e[0;31m'
+redhl='\e[0;31;7m'
+blue='\e[0;34m'
+cyan='\e[0;36m'
+NC='\e[0m' # No Color
+
+VERSION=2.5
+PATH_INSTALL=/usr/local/
+
+if [ "$(id -u)" != "0" ]; then
+   echo -e $red"This script must be run as root." 1>&2D
+   exit 1
+fi
+
+dependance=(
+	libssl-dev
+	libnl-genl-3-dev
+	libnl-3-dev
+	bridge-utils 
+	pkg-config 
+	make 
+	patch 
+	gcc 
+	hostapd
+)
+
+apt-get install -y ${dependance[@]}
+
+cd ${PATH_INSTALL}src/
+wget http://w1.fi/releases/hostapd-${VERSION}.tar.gz
+
+
+tar xzvf hostapd-${VERSION}.tar.gz
+cd hostapd-${VERSION}
+
+# Get patch and apply
+wget https://raw.githubusercontent.com/jbsky/McDebian/hostapd.install/patch/hostapd.patch
+patch -p0 < hostapd.patch
+
+cd hostapd
+cp defconfig .config
+
+cat << EOF >> .config
+CONFIG_DRIVER_NL80211=y
+CONFIG_ACS=y
+CONFIG_IEEE80211R=y
+CONFIG_IEEE80211N=y
+CONFIG_IEEE80211AC=y
+CONFIG_LIBNL32=y
+CONFIG_CTRL_IFACE=y
+CONFIG_WPS=y
+CONFIG_WPS2=y
+CONFIG_P2P=y
+CONFIG_AP=y
+EOF
+
+make
+systemctl stop hostapd
+cp hostapd /usr/sbin/
+cp hostapd_cli /usr/sbin/
+systemctl start hostapd

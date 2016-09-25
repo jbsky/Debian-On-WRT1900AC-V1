@@ -1,0 +1,29 @@
+--- linux-4.4.1/drivers/Kconfig	2016-01-31 20:29:37.000000000 +0100
++++ ./drivers/Kconfig	2016-02-04 19:19:56.538712687 +0100
+@@ -2,6 +2,8 @@
+ 
+ source "drivers/amba/Kconfig"
+ 
++source "drivers/mwlwifi/Kconfig"
++
+ source "drivers/base/Kconfig"
+ 
+ source "drivers/bus/Kconfig"
+--- linux-4.4.1/firmware/Makefile	2016-01-31 20:29:37.000000000 +0100
++++ ./firmware/Makefile	2016-02-04 19:21:41.239855765 +0100
+@@ -39,6 +39,7 @@
+ 			     bnx2/bnx2-rv2p-09ax-6.0.17.fw \
+ 			     bnx2/bnx2-mips-06-6.2.1.fw \
+ 			     bnx2/bnx2-rv2p-06-6.0.15.fw
++fw-shipped-$(CONFIG_MWLWIFI) += mwlwifi/88W8864.bin mwlwifi/88W8897.bin mwlwifi/Marvell_license.txt
+ fw-shipped-$(CONFIG_CASSINI) += sun/cassini.bin
+ fw-shipped-$(CONFIG_CHELSIO_T3) += cxgb3/t3b_psram-1.1.0.bin \
+ 				   cxgb3/t3c_psram-1.1.0.bin \
+--- ../Makefile	2016-03-06 00:30:30.200892005 +0100
++++ drivers/Makefile	2016-03-06 00:31:13.685365695 +0100
+@@ -172,3 +172,5 @@
+ obj-$(CONFIG_ANDROID)		+= android/
+ obj-$(CONFIG_NVMEM)		+= nvmem/
+ obj-$(CONFIG_FPGA)		+= fpga/
++obj-$(CONFIG_MWLWIFI)           += mwlwifi/
++

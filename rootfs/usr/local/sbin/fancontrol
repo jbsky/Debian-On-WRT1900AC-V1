@@ -1,0 +1,30 @@
+#!/bin/bash
+
+Tmin=40
+Tmax=75
+Vmax=255
+# Vmin=0
+
+while true ; do
+
+CurTemp=`cut -c 1-3 /sys/class/thermal/thermal_zone0/temp`
+KT=$((Vmax*(CurTemp/10-Tmin)/(Tmax-Tmin)))
+
+	if [ $KT -ge 255 ]; then
+		KT=255
+	fi
+
+	if [ $KT -le 0 ]; then
+		KT=0
+	fi
+
+	if [ $KT -ge 255 ] && [ $CurTemp -ge 900 ]; then
+                echo "`date`: FAN 100%" >> /root/overheat.log
+                echo `sensors|grep +` >> /root/overheat.log
+	fi
+
+echo $KT > /sys/class/hwmon/hwmon0/pwm1
+
+#printf "%s	%s	%s	%s\n" $K $KT $CurTemp $PrevTemp 
+sleep 15
+done
