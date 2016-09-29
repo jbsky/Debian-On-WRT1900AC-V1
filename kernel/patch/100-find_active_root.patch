@@ -1,16 +1,15 @@
---- drivers/mtd/ofpart.c.orig	2016-06-16 21:49:46.629464388 +0200
-+++ drivers/mtd/ofpart.c.topatch	2016-06-16 22:01:00.000000000 +0200
-@@ -25,6 +25,9 @@
+--- a/drivers/mtd/ofpart.c	2016-09-24 10:10:18.000000000 +0200
++++ a/drivers/mtd/ofpart.c	2016-09-29 22:17:33.000000000 +0200
+@@ -25,6 +25,8 @@
  	return of_get_property(pp, "compatible", NULL);
  }
  
 +static int mangled_rootblock;
 +
-+
  static int parse_ofpart_partitions(struct mtd_info *master,
  				   const struct mtd_partition **pparts,
  				   struct mtd_part_parser_data *data)
-@@ -33,6 +36,7 @@
+@@ -33,6 +35,7 @@
  	struct device_node *mtd_node;
  	struct device_node *ofpart_node;
  	const char *partname;
@@ -18,7 +17,7 @@
  	struct device_node *pp;
  	int nr_parts, i, ret = 0;
  	bool dedicated = true;
-@@ -109,9 +113,17 @@
+@@ -109,9 +112,15 @@
  		parts[i].offset = of_read_number(reg, a_cells);
  		parts[i].size = of_read_number(reg + a_cells, s_cells);
  
@@ -34,15 +33,15 @@
 +			if (!partname)
 +				partname = of_get_property(pp, "name", &len);
 +		}
-+
-+
  		parts[i].name = partname;
  
  		if (of_get_property(pp, "read-only", &len))
-@@ -214,6 +226,20 @@
+@@ -212,6 +221,18 @@
+ 	return 0;
+ }
  
- static int __init active_root(char *str)
- {
++static int __init active_root(char *str)
++{
 +	get_option(&str, &mangled_rootblock);
 +
 +	if (!mangled_rootblock)
@@ -53,10 +52,6 @@
 +
 +__setup("mangled_rootblock=", active_root);
 +
-+
-+
-+static int __init active_root(char *str)
-+{
- 	get_option(&str, &mangled_rootblock);
- 
- 	if (!mangled_rootblock)
+ static void __exit ofpart_parser_exit(void)
+ {
+ 	deregister_mtd_parser(&ofpart_parser);
