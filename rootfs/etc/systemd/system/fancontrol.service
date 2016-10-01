@@ -5,11 +5,8 @@ After=networking.service
 [Service]
 Type=simple
 ExecStart=/usr/local/sbin/fancontrol
-ExecStop=/usr/bin/pkill fancontrol
 PrivateTmp=true
 NonBlocking=yes
 
 [Install]
 WantedBy=multi-user.target
-
-

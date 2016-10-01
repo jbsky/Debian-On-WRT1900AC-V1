@@ -3,7 +3,6 @@
 source-directory /etc/network/interfaces.d
 
 auto lo br-lan
-
 iface lo inet loopback
 
 allow-hotplug wlan0

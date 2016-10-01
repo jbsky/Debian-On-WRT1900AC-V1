@@ -1,0 +1,102 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          firewall
+# Required-Start:    $remote_fs
+# Required-Stop:     $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: firewall daemon
+# Description:       firewall static
+### END INIT INFO
+
+#
+# Author:
+#
+
+# PATH should only include /usr/* if it runs after the mountnfs.sh script
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="firewall"
+NAME=firewall
+
+RESTORE=/sbin/iptables-restore
+SAVE=/sbin/iptables-save
+DAEMON=/usr/sbin/firewall
+PIDFILE=/var/run/firewall.pid
+RULES=/etc/firewall/firewall
+SCRIPTNAME=/etc/init.d/$NAME
+
+# Exit if the package is not installed
+# [ -x "$DAEMON" ] || exit 0
+
+# Define LSB log_* functions.
+. /lib/lsb/init-functions
+
+do_start()
+{
+	$RESTORE < $RULES
+	echo 0
+	# Return
+	#   0 if daemon has been started
+	#   1 if daemon was already running
+	#   other if daemon could not be started or a failure occured
+	#start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON
+}
+do_save()
+{
+        $SAVE > $RULES
+        echo 0
+        # Return
+        #   0 if daemon has been stopped
+        #   1 if daemon was already stopped
+        #   other if daemon could not be stopped or a failure occurred
+        # start-stop-daemon --stop --quiet --retry 5 --pidfile $PIDFILE --name $
+}
+
+
+do_stop()
+{
+	echo 0
+	# Return
+	#   0 if daemon has been stopped
+	#   1 if daemon was already stopped
+	#   other if daemon could not be stopped or a failure occurred
+	# start-stop-daemon --stop --quiet --retry 5 --pidfile $PIDFILE --name $NAME
+}
+
+
+case "$1" in
+  start)
+	log_daemon_msg "Starting $DESC" "$NAME"
+	do_start
+	case "$?" in
+		0) log_end_msg 0 ;;
+		1) log_progress_msg "already started"
+		   log_end_msg 0 ;;
+		*) log_end_msg 1 ;;
+	esac
+	;;
+  stop)
+	log_daemon_msg "Stopping $DESC" "$NAME"
+	do_stop
+	case "$?" in
+		0) log_end_msg 0 ;;
+		1) log_progress_msg "already stopped"
+		   log_end_msg 0 ;;
+		*) log_end_msg 1 ;;
+	esac
+	;;
+  restart)
+	$0 stop
+	$0 start
+	;;
+  save)
+	do_save
+	exit 0
+	;;
+  *)
+	echo "Usage: $SCRIPTNAME {start|stop|restart|save}" >&2
+	exit 3
+	;;
+esac
+
+:

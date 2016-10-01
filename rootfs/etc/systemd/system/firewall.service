@@ -1,0 +1,16 @@
+[Unit]
+Description=Netfilter
+DefaultDependencies=no
+After=systemd-sysctl.service
+Before=sysinit.target
+
+[Service]
+WorkingDirectory=/etc/firewall
+ExecStart=/etc/init.d/firewall start
+ExecStop=/etc/init.d/firewall stop
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+

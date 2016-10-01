@@ -1,0 +1,13 @@
+#!/bin/bash -x
+##################################################
+### Script de purge du cache de la mémoire RAM ###
+##################################################
+logger "sync : Ecriture du cache disque en cours"
+sync
+logger "Vidage du cache de la memoire RAM niveau 3"
+echo 3> /proc/sys/vm/drop_caches
+sleep 1
+logger "sync : Reécriture du cache disque en cours"
+sync
+logger "Cache disque remis à zero."
+echo 0> /proc/sys/vm/drop_caches
