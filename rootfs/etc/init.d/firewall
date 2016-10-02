@@ -24,7 +24,7 @@ DAEMON=/usr/sbin/firewall
 PIDFILE=/var/run/firewall.pid
 RULES=/etc/firewall/firewall
 SCRIPTNAME=/etc/init.d/$NAME
-
+ipt=/sbin/iptables
 # Exit if the package is not installed
 # [ -x "$DAEMON" ] || exit 0
 
@@ -55,6 +55,18 @@ do_save()
 
 do_stop()
 {
+$ipt -P INPUT ACCEPT
+$ipt -P FORWARD ACCEPT
+$ipt -P OUTPUT ACCEPT
+$ipt -F
+$ipt -X
+$ipt -t nat -F
+$ipt -t nat -X
+$ipt -t mangle -F
+$ipt -t mangle -X
+$ipt -t raw -F
+$ipt -t raw -X
+
 	echo 0
 	# Return
 	#   0 if daemon has been stopped

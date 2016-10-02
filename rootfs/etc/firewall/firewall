@@ -93,7 +93,7 @@
 -A LOOPBACK -o lo -j ACCEPT
 -A LOOPBACK -s 127.0.0.0/8 -j DROP
 -A LOOPBACK -d 127.0.0.0/8 -j DROP
--A NEWNOTSYN -m limit --limit 10/min -j LOG --log-prefix "DROP_NEWNOTSYN "
+# -A NEWNOTSYN -m limit --limit 10/min -j LOG --log-prefix "DROP_NEWNOTSYN "
 -A NEWNOTSYN -m comment --comment DROP_NEWNOTSYN -j DROP
 -A PSCAN -p tcp -m limit --limit 10/min -m comment --comment "DROP_TCP PScan" -j LOG --log-prefix "DROP_TCP Scan "
 -A PSCAN -p udp -m limit --limit 10/min -m comment --comment "DROP_UDP PScan" -j LOG --log-prefix "DROP_UDP Scan "
