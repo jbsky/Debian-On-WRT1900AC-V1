@@ -1,15 +1,23 @@
---- linux-4.4.1/drivers/Kconfig	2016-01-31 20:29:37.000000000 +0100
-+++ ./drivers/Kconfig	2016-02-04 19:19:56.538712687 +0100
-@@ -2,6 +2,8 @@
+--- linux/drivers/net/wireless/marvell/Makefile	2016-12-15 17:50:48.000000000 +0100
++++ ./drivers/net/wireless/marvell/Makefile	2016-12-18 19:41:30.020538550 +0100
+@@ -4,3 +4,5 @@
+ obj-$(CONFIG_MWIFIEX)	+= mwifiex/
  
- source "drivers/amba/Kconfig"
- 
-+source "drivers/mwlwifi/Kconfig"
+ obj-$(CONFIG_MWL8K)	+= mwl8k.o
++obj-$(CONFIG_MWLWIFI)   += mwlwifi/
 +
- source "drivers/base/Kconfig"
- 
- source "drivers/bus/Kconfig"
---- linux-4.4.1/firmware/Makefile	2016-01-31 20:29:37.000000000 +0100
+--- linux/drivers/net/wireless/marvell/Kconfig	2016-12-15 17:50:48.000000000 +0100
++++ ./drivers/net/wireless/marvell/Kconfig	2016-12-18 19:39:56.284335725 +0100
+@@ -14,7 +14,7 @@
+ source "drivers/net/wireless/marvell/libertas/Kconfig"
+ source "drivers/net/wireless/marvell/libertas_tf/Kconfig"
+ source "drivers/net/wireless/marvell/mwifiex/Kconfig"
+-
++source "drivers/net/wireless/marvell/mwlwifi/Kconfig"
+ config MWL8K
+ 	tristate "Marvell 88W8xxx PCI/PCIe Wireless support"
+ 	depends on MAC80211 && PCI
+--- linux/firmware/Makefile	2016-01-31 20:29:37.000000000 +0100
 +++ ./firmware/Makefile	2016-02-04 19:21:41.239855765 +0100
 @@ -39,6 +39,7 @@
  			     bnx2/bnx2-rv2p-09ax-6.0.17.fw \
@@ -19,11 +27,3 @@
  fw-shipped-$(CONFIG_CASSINI) += sun/cassini.bin
  fw-shipped-$(CONFIG_CHELSIO_T3) += cxgb3/t3b_psram-1.1.0.bin \
  				   cxgb3/t3c_psram-1.1.0.bin \
---- ../Makefile	2016-03-06 00:30:30.200892005 +0100
-+++ drivers/Makefile	2016-03-06 00:31:13.685365695 +0100
-@@ -172,3 +172,5 @@
- obj-$(CONFIG_ANDROID)		+= android/
- obj-$(CONFIG_NVMEM)		+= nvmem/
- obj-$(CONFIG_FPGA)		+= fpga/
-+obj-$(CONFIG_MWLWIFI)           += mwlwifi/
-+
