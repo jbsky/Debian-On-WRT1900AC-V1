@@ -1,0 +1,47 @@
+#!/bin/bash
+MACHINE=WRT1900AC
+ARCH=armhf
+DIR=/home/${MACHINE}
+DEPOT=http://ftp.debian.org/debian/
+CODE=jessie
+IP=192.168.0.1
+MASK=255.255.255.0
+GW=192.168.0.254
+PWD_ROOT=P@ssw0r2
+
+mkdir  -p ${DIR}/${CODE}-${ARCH}
+cd ${DIR}/${CODE}-${ARCH}
+echo "1st phase..."
+debootstrap --foreign --no-check-gpg --arch=${ARCH} ${CODE} ${DIR}/${CODE}-${ARCH} ${DEPOT}
+cp /usr/bin/qemu-arm-static ${DIR}/${CODE}-${ARCH}/usr/bin/
+cp /etc/resolv.conf ${DIR}/${CODE}-${ARCH}/etc/
+echo ${MACHINE} > ${DIR}/${CODE}-${ARCH}/etc/hostname
+
+cat << EOF > ${DIR}/${CODE}-${ARCH}/startup
+echo "2nd phase..."
+/debootstrap/debootstrap --second-stage
+
+echo "root:${PWD_ROOT}" | chpasswd
+cat << FILE > /etc/apt/sources.list
+deb ${DEPOT} ${CODE} main contrib non-free
+deb ${DEPOT} ${CODE}-updates main contrib non-free
+deb http://security.debian.org/debian-security ${CODE}/updates main contrib non-free
+FILE
+apt-get update
+apt-get install ca-certificates  locales localepurge dialog openssh-server ntpdate debconf -y
+apt-get dist-upgrade -y
+cat << FILE >> /etc/network/interfaces
+allow-hotplug eth0
+iface eth0 inet static
+address ${IP}
+gateway ${GW}
+netmask ${MASK}
+FILE
+apt-get clean
+exit
+EOF
+chmod +x ${DIR}/${CODE}-${ARCH}/startup
+chroot ${DIR}/${CODE}-${ARCH} /startup
+echo "if you need :
+Pour configurer les variables LC   : dpkg-reconfigure locales
+Pour configurer la time zone Paris : dpkg-reconfigure tzdata"
