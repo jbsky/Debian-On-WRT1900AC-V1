@@ -26,8 +26,8 @@ iperf3.exe -c SRV1 -P 6<BR />
 [SUM] 0.00-10.00 sec 517 MBytes 433 Mbits/sec receiver
 
 iperf3.exe -c SRV1 -P 6 -R<BR />
-[SUM] 0.00-10.00 sec 426 MBytes 357 Mbits/sec 213 sender
-[SUM] 0.00-10.00 sec 420 MBytes 352 Mbits/sec receiver
+[SUM] 0.00-10.00 sec 404 MBytes 339 Mbits/sec 568 sender
+[SUM] 0.00-10.00 sec 401 MBytes 336 Mbits/sec receiver
 
 iperf3.exe -c WRT -P 6<BR />
 [SUM] 0.00-10.00 sec 252 MBytes 212 Mbits/sec sender
