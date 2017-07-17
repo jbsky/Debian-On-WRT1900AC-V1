@@ -1,5 +1,5 @@
 #!/bin/bash
-VER=4.11.8
+VER=4.11.11
 
 # set Ip or FQDN of your router.
 WRT=wrt

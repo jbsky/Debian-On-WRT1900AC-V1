@@ -15,27 +15,38 @@ iperf3 test with intel 7260-AC with -P 6 -R<BR />
 [SUM] 0.00-10.02 sec 425 MBytes 356 Mbits/sec 18 sender<BR />
 [SUM] 0.00-10.02 sec 423 MBytes 354 Mbits/sec receiver<BR />
 
-# .config
+# .config 4.11.11
 ## Any addition is made at most by the modules
-
-=> mwlwifi latest
+=> mwlwifi 10.3.4.0-20170713
 
 see diagram : iperftest.jpg<BR />
 
 iperf3.exe -c SRV1 -P 6<BR />
-[SUM] 0.00-10.00 sec 488 MBytes 409 Mbits/sec sender<BR />
-[SUM] 0.00-10.00 sec 488 MBytes 409 Mbits/sec receiver<BR />
+[SUM] 0.00-10.00 sec 517 MBytes 433 Mbits/sec sender
+[SUM] 0.00-10.00 sec 517 MBytes 433 Mbits/sec receiver
 
 iperf3.exe -c SRV1 -P 6 -R<BR />
-[SUM] 0.00-10.00 sec 322 MBytes 270 Mbits/sec 1145 sender<BR />
-[SUM] 0.00-10.00 sec 318 MBytes 267 Mbits/sec receiver<BR />
+[SUM] 0.00-10.00 sec 426 MBytes 357 Mbits/sec 213 sender
+[SUM] 0.00-10.00 sec 420 MBytes 352 Mbits/sec receiver
 
 iperf3.exe -c WRT -P 6<BR />
-[SUM] 0.00-10.00 sec 102 MBytes 85.5 Mbits/sec sender<BR />
-[SUM] 0.00-10.00 sec 101 MBytes 84.8 Mbits/sec receiver<BR />
+[SUM] 0.00-10.00 sec 252 MBytes 212 Mbits/sec sender
+[SUM] 0.00-10.00 sec 252 MBytes 211 Mbits/sec receiver
 
 iperf3.exe -c WRT -P 6 -R<BR />
-[SUM] 0.00-10.00 sec 320 MBytes 269 Mbits/sec 15 sender<BR />
-[SUM] 0.00-10.00 sec 318 MBytes 266 Mbits/sec receiver<BR />
+[SUM] 0.00-10.00 sec 453 MBytes 380 Mbits/sec 4 sender
+[SUM] 0.00-10.00 sec 450 MBytes 377 Mbits/sec receiver
 
 I have a significant data rate drop from PC1 to WRT1900AC.<BR />
+
+## wired connection
+=> avoid DSA, from SRV
+
+iperf3 -c wrt 
+[  4] 0.00-10.00 sec 1.10 GBytes 942 Mbits/sec 23 sender
+[  4] 0.00-10.00 sec 1.10 GBytes 941 Mbits/sec receiver
+
+iperf3 -c wrt -R
+[  4] 0.00-10.00 sec 1.10 GBytes 943 Mbits/sec 0 sender
+[  4] 0.00-10.00 sec 1.10 GBytes 941 Mbits/sec receiver
+
