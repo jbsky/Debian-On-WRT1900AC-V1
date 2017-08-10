@@ -2,7 +2,7 @@
 
 ## How to make you own kernel?
 => arch debian i386 or amd64, open a term :<BR />
-* `apt-get install git fakeroot build-essential ncurses-dev xz-utils libssl-dev bc liblz4-tool kernel-package`<BR />
+* `apt-get install git fakeroot build-essential ncurses-dev xz-utils libssl-dev bc liblz4-tool kernel-package u-boot-tools`<BR />
 * `wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel/mkKNLWRT1900AC`<BR />
 * `chmod +x mkKNLWRT1900AC`<BR />
 * Edit script to adjust vars.<BR />

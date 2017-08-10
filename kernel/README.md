@@ -1,3 +1,28 @@
+# Start from arch/arm/configs/mvebu_v7_defconfig is a good start :))
+
+#### Required options
+* cgroup 
+* boot cmdline
+* fs : NTFS/autofs4/fuse
+* ikconfig
+* mac80211
+* Don't forget to add some ipv4/6 options as netfilter
+* #### !netfilter impact performance!
+
+#### Added option specific to architecture mvebu v7 :
+* DSA switch for MV88E6XXX
+* mnveta/bm 
+* mwlwifi*
+* I2C_MV64XXX
+* gpio/pwm fancontrol*
+* leds TLC591XX
+
+` * from patch`
+
+#### !CPU Powermanagement disabled because this affect performance!
+* CPU Frequency scaling
+* CPU idle PM support
+
 # .config.localmod 4.7.4
 ## strictly minimum for WRT1900ac V1
 * only brigde
