@@ -1,0 +1,136 @@
+--- linux-4.12.5-base/drivers/net/wireless/marvell/mwlwifi/hif/fwcmd.c	2017-08-10 03:49:38.000000000 +0200
++++ linux/drivers/net/wireless/marvell/mwlwifi/hif/fwcmd.c	2017-08-30 16:07:24.000000000 +0200
+@@ -152,14 +152,18 @@
+ 	pcmd->bw = cpu_to_le16(width);
+ 	pcmd->band = cpu_to_le16(band);
+ 	pcmd->sub_ch = cpu_to_le16(sub_ch);
++	wiphy_debug(priv->hw->wiphy,"mwl_fwcmd_get_tx_powers : channel = %d/%d",pcmd->ch,pcmd->sub_ch);
+ 
+ 	if (mwl_hif_exec_cmd(priv->hw, HOSTCMD_CMD_802_11_TX_POWER)) {
+ 		mutex_unlock(&priv->fwcmd_mutex);
+ 		return -EIO;
+ 	}
+ 
+-	for (i = 0; i < SYSADPT_TX_POWER_LEVEL_TOTAL; i++)
++	for (i = 0; i < SYSADPT_TX_POWER_LEVEL_TOTAL; i++) {
+ 		powlist[i] = le16_to_cpu(pcmd->power_level_list[i]);
++		wiphy_debug(priv->hw->wiphy,"mwl_fwcmd_get_tx_powers : pcmd->power_level_list[%d] = %d",i, pcmd->power_level_list[i]);
++		wiphy_debug(priv->hw->wiphy,"mwl_fwcmd_get_tx_powers : powlist[%d] = %d",i, powlist[i]);
++	}
+ 
+ 	mutex_unlock(&priv->fwcmd_mutex);
+ 
+@@ -185,9 +189,13 @@
+ 	pcmd->bw = cpu_to_le16(width);
+ 	pcmd->band = cpu_to_le16(band);
+ 	pcmd->sub_ch = cpu_to_le16(sub_ch);
++	wiphy_debug(priv->hw->wiphy,"mwl_fwcmd_set_tx_powers : channel->hw_value = %d , sub_ch = %d",pcmd->ch, pcmd->sub_ch);
+ 
+-	for (i = 0; i < SYSADPT_TX_POWER_LEVEL_TOTAL; i++)
++	for (i = 0; i < SYSADPT_TX_POWER_LEVEL_TOTAL; i++){
+ 		pcmd->power_level_list[i] = cpu_to_le16(txpow[i]);
++		wiphy_debug(priv->hw->wiphy,"mwl_fwcmd_set_tx_powers : pcmd->power_level_list[%d] = %d",i, pcmd->power_level_list[i]);
++
++	}
+ 
+ 	if (mwl_hif_exec_cmd(priv->hw, HOSTCMD_CMD_802_11_TX_POWER)) {
+ 		mutex_unlock(&priv->fwcmd_mutex);
+@@ -685,6 +693,7 @@
+ 	pcmd->cmd_hdr.cmd = cpu_to_le16(HOSTCMD_CMD_SET_POWER_CONSTRAINT);
+ 	pcmd->cmd_hdr.len = cpu_to_le16(sizeof(*pcmd));
+ 	pcmd->power_constraint = cpu_to_le32(power_constraint);
++	wiphy_debug(priv->hw->wiphy,"mwl_fwcmd_set_power_constraint : pcmd->power_constraint = %d",power_constraint);
+ 
+ 	if (mwl_hif_exec_cmd(priv->hw, HOSTCMD_CMD_SET_POWER_CONSTRAINT)) {
+ 		mutex_unlock(&priv->fwcmd_mutex);
+@@ -1040,7 +1049,7 @@
+ 		reduce_val = 0xff;
+ 		break;
+ 	}
+-
++	reduce_val = 0;    /* Max */
+ 	if (channel->band == NL80211_BAND_2GHZ)
+ 		band = FREQ_BAND_2DOT4GHZ;
+ 	else if (channel->band == NL80211_BAND_5GHZ)
+@@ -1071,23 +1080,31 @@
+ 	}
+ 
+ 	if ((priv->powinited & MWL_POWER_INIT_2) == 0) {
++		wiphy_debug(hw->wiphy,"mwl_fwcmd_max_tx_power : MWL_POWER_INIT_2");
+ 		mwl_fwcmd_get_tx_powers(priv, priv->max_tx_pow,
+ 					channel->hw_value, band, width, sub_ch);
+ 		priv->powinited |= MWL_POWER_INIT_2;
+ 	}
+ 
+ 	if ((priv->powinited & MWL_POWER_INIT_1) == 0) {
++		wiphy_debug(hw->wiphy,"mwl_fwcmd_max_tx_power : MWL_POWER_INIT_1");
+ 		mwl_fwcmd_get_tx_powers(priv, priv->target_powers,
+ 					channel->hw_value, band, width, sub_ch);
+ 		priv->powinited |= MWL_POWER_INIT_1;
+ 	}
++	wiphy_debug(hw->wiphy,"mwl_fwcmd_max_tx_power : channel->hw_value = %d, sub_ch = %d",channel->hw_value, sub_ch);
+ 
+ 	for (i = 0; i < SYSADPT_TX_POWER_LEVEL_TOTAL; i++) {
++		wiphy_debug(hw->wiphy,"priv->target_powers[%d]  > priv->max_tx_pow[%d] : %d > %d",i,i, priv->target_powers[i], priv->max_tx_pow[i]);
++
+ 		if (priv->target_powers[i] > priv->max_tx_pow[i])
+ 			tmp = priv->max_tx_pow[i];
+ 		else
+ 			tmp = priv->target_powers[i];
++		// maxtxpow[i] = (20 - i > 0) ? (20 - i) : 0;
+ 		maxtxpow[i] = ((tmp - reduce_val) > 0) ? (tmp - reduce_val) : 0;
++
++		wiphy_debug(hw->wiphy,"mwl_fwcmd_max_tx_power : maxtxpow[%d] = %d",i, maxtxpow[i]);
+ 	}
+ 
+ 	rc = mwl_fwcmd_set_tx_powers(priv, maxtxpow, HOSTCMD_ACT_GEN_SET,
+@@ -1129,6 +1146,7 @@
+ 		reduce_val = 0xff;
+ 		break;
+ 	}
++	reduce_val = 0;    /* Max */
+ 
+ 	if (channel->band == NL80211_BAND_2GHZ)
+ 		band = FREQ_BAND_2DOT4GHZ;
+@@ -1193,6 +1211,7 @@
+ 	}
+ 
+ 	if ((priv->powinited & MWL_POWER_INIT_2) == 0) {
++		wiphy_debug(hw->wiphy,"mwl_fwcmd_tx_power : MWL_POWER_INIT_2");
+ 		mwl_fwcmd_get_tx_powers(priv, priv->max_tx_pow,
+ 					channel->hw_value, band, width, sub_ch);
+ 
+@@ -1200,6 +1219,8 @@
+ 	}
+ 
+ 	if ((priv->powinited & MWL_POWER_INIT_1) == 0) {
++		wiphy_debug(hw->wiphy,"mwl_fwcmd_tx_power : MWL_POWER_INIT_1");
++
+ 		mwl_fwcmd_get_tx_powers(priv, priv->target_powers,
+ 					channel->hw_value, band, width, sub_ch);
+ 
+@@ -1209,19 +1230,22 @@
+ 	for (i = 0; i < SYSADPT_TX_POWER_LEVEL_TOTAL; i++) {
+ 		if (found) {
+ 			if ((priv->tx_pwr_tbl[index].setcap) &&
+-			    (priv->tx_pwr_tbl[index].tx_power[i] >
++			    (priv->tx_pwr_tbl[index].tx_power[i] >
+ 			    priv->max_tx_pow[i]))
+ 				tmp = priv->max_tx_pow[i];
+ 			else
+ 				tmp = priv->tx_pwr_tbl[index].tx_power[i];
+ 		} else {
+-			if (priv->target_powers[i] > priv->max_tx_pow[i])
++			if (priv->target_powers[i] > priv->max_tx_pow[i])
+ 				tmp = priv->max_tx_pow[i];
+ 			else
+ 				tmp = priv->target_powers[i];
+ 		}
+ 
+ 		txpow[i] = ((tmp - reduce_val) > 0) ? (tmp - reduce_val) : 0;
++		wiphy_debug(hw->wiphy,"mwl_fwcmd_tx_power : channel->hw_value = %d , sub_ch = %d",channel->hw_value, sub_ch);
++		wiphy_debug(hw->wiphy,"mwl_fwcmd_tx_power : txpow[%d] = %d",i, txpow[i]);
++
+ 	}
+ 
+ 	rc = mwl_fwcmd_set_tx_powers(priv, txpow, HOSTCMD_ACT_GEN_SET_LIST,
