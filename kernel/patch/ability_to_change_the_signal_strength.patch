@@ -1,0 +1,36 @@
+--- linux-4.12.5-base/drivers/net/wireless/marvell/mwlwifi/mac80211.c	2017-08-10 03:49:38.000000000 +0200
++++ linux/drivers/net/wireless/marvell/mwlwifi/mac80211.c	2017-08-31 14:38:57.000000000 +0200
+@@ -286,6 +286,13 @@
+ 		rc = mwl_fwcmd_set_cdd(hw);
+ 	}
+ 
++	if (changed & IEEE80211_CONF_CHANGE_POWER) {
++		rc = mwl_fwcmd_max_tx_power(hw, conf, 0);
++		if (rc)
++			goto out;
++		rc = mwl_fwcmd_tx_power(hw, conf, 0);
++	}
++
+ out:
+ 
+ 	return rc;
+--- linux-4.12.5-base/drivers/net/wireless/marvell/mwlwifi/hif/fwcmd.c	2017-08-10 03:49:38.000000000 +0200
++++ linux/drivers/net/wireless/marvell/mwlwifi/hif/fwcmd.c	2017-08-31 14:40:33.000000000 +0200
+@@ -1087,7 +1087,7 @@
+ 			tmp = priv->max_tx_pow[i];
+ 		else
+ 			tmp = priv->target_powers[i];
+-		maxtxpow[i] = ((tmp - reduce_val) > 0) ? (tmp - reduce_val) : 0;
++		maxtxpow[i] = conf->power_level;
+ 	}
+ 
+ 	rc = mwl_fwcmd_set_tx_powers(priv, maxtxpow, HOSTCMD_ACT_GEN_SET,
+@@ -1221,7 +1221,7 @@
+ 				tmp = priv->target_powers[i];
+ 		}
+ 
+-		txpow[i] = ((tmp - reduce_val) > 0) ? (tmp - reduce_val) : 0;
++		txpow[i] = conf->power_level;
+ 	}
+ 
+ 	rc = mwl_fwcmd_set_tx_powers(priv, txpow, HOSTCMD_ACT_GEN_SET_LIST,
