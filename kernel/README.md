@@ -1,4 +1,4 @@
-# Start from arch/arm/configs/mvebu_v7_defconfig is a good start :))
+# Starting from arch/arm/configs/mvebu_v7_defconfig is a good start
 
 #### Required options
 * cgroup 
@@ -74,4 +74,5 @@ iperf3 -c wrt
 iperf3 -c wrt -R
 [  4] 0.00-10.00 sec 1.10 GBytes 943 Mbits/sec 0 sender
 [  4] 0.00-10.00 sec 1.10 GBytes 941 Mbits/sec receiver
+
 
