@@ -1,9 +1,9 @@
 #!/bin/bash
-VER=4.12.9
+VER=4.9.60
 
 # set Ip or FQDN of your router.
 WRT=wrt
-wget http://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${VER}.tar.xz
+#wget http://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${VER}.tar.xz
 tar xvfJ linux-${VER}.tar.xz
 rm linux
 ln -s linux-${VER} linux
@@ -15,14 +15,14 @@ mv mwlwifi-master/bin/firmware firmware/mwlwifi
 mv mwlwifi-master/Makefile.kernel mwlwifi-master/Makefile
 mv mwlwifi-master/ drivers/net/wireless/marvell/mwlwifi
 
-wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.12.9/fan.patch
-wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.12.9/mwlwifi.patch
-wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.12.9/add_mamba_powertables.patch
-wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.12.9/ability_to_change_the_signal_strength.patch
+wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.9.60/fan.patch
+wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.9.60/mwlwifi.patch
+wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.9.60/add_mamba_powertables.patch
+wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.9.60/ability_to_change_the_signal_strength.patch
 patch -p0 < mwlwifi.patch
 patch -p1 < fan.patch
 patch -p1 < add_mamba_powertables.patch
-patch -p1 < ability_to_change_the_signal_strength.patch
+patch -p0 < ability_to_change_the_signal_strength.patch
 
 wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.12.9/.config
 
