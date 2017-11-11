@@ -3,17 +3,29 @@
 ## How to make you own kernel?
 => arch debian i386 or amd64, open a term :<BR />
 * `apt-get install git fakeroot build-essential ncurses-dev xz-utils libssl-dev bc liblz4-tool kernel-package u-boot-tools`<BR />
-* `wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel/mkKNLWRT1900AC`<BR />
-* `chmod +x mkKNLWRT1900AC`<BR />
-* Edit script to adjust vars.<BR />
-* `./mkKNLWRT1900AC`<BR />
+* `wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.9.60/prekernel`<BR />
+* `wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.9.60/kernel`<BR />
+* `wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.9.60/menu`<BR />
+* `chmod +x prekernel`<BR />
+* `chmod +x kernel`<BR />
+* Edit scripts to adjust vars.<BR />
+* `./prekernel`<BR />
+* `cd linux`<BR />
+* Need to go into menu?
+* `../menu`<BR />
+* Go compiling...<BR />
+* `../kernel`<BR />
+* After compiling, new firmware is Firmware-WRT1900AC-V1
+* modules are in module/*
+
+
 ## How to make you own file system?
 => arch debian i386 or amd64, open a term :<BR />
 * `apt-get install debootstrap  qemu-user-static arm-none-eabi*`<BR />
-* `wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel/mkFSWRT1900AC`<BR />
-* `chmod +x mkFSWRT1900AC`<BR />
+* `wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/fs/dofs`<BR />
+* `chmod +x dofs`<BR />
 * Edit script to adjust vars.<BR />
-* `./mkFSWRT1900AC`<BR />
+* `./dofs`<BR />
 
 ## How to flash?
 see https://github.com/Chadster766/McWRT/wiki/Flashing-Firmware-using-a-USB-to-TTL-Cable<BR />
