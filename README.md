@@ -5,7 +5,7 @@
 * `apt-get install git fakeroot build-essential ncurses-dev xz-utils libssl-dev bc liblz4-tool kernel-package u-boot-tools`<BR />
 * `wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.9.60/prekernel`<BR />
 * `wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.9.60/kernel`<BR />
-* `wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.9.60/menu`<BR />
+* `wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/menu`<BR />
 * `chmod +x prekernel`<BR />
 * `chmod +x kernel`<BR />
 * `chmod +x menu`<BR />
@@ -43,7 +43,6 @@ Tmin=50<BR />
 Tmax=80<BR />
 Vmax=255<BR />
 V=Vmax*(CurTemp-Tmin)/(Tmax-Tmin)<BR />
-Sea diagram : fancontrol.jpg
 ![image](https://github.com/jbsky/Debian-On-WRT1900AC-V1/blob/master/fancontrol.jpg)
 <BR />
 
