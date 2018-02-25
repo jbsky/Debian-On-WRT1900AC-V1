@@ -1,0 +1,19 @@
+--- linux/drivers/net/wireless/marvell/Makefile	2016-12-15 17:50:48.000000000 +0100
++++ ./drivers/net/wireless/marvell/Makefile	2016-12-18 19:41:30.020538550 +0100
+@@ -4,3 +4,5 @@
+ obj-$(CONFIG_MWIFIEX)	+= mwifiex/
+ 
+ obj-$(CONFIG_MWL8K)	+= mwl8k.o
++obj-$(CONFIG_MWLWIFI)   += mwlwifi/
++
+--- linux/drivers/net/wireless/marvell/Kconfig	2016-12-15 17:50:48.000000000 +0100
++++ ./drivers/net/wireless/marvell/Kconfig	2016-12-18 19:39:56.284335725 +0100
+@@ -14,7 +14,7 @@
+ source "drivers/net/wireless/marvell/libertas/Kconfig"
+ source "drivers/net/wireless/marvell/libertas_tf/Kconfig"
+ source "drivers/net/wireless/marvell/mwifiex/Kconfig"
+-
++source "drivers/net/wireless/marvell/mwlwifi/Kconfig"
+ config MWL8K
+ 	tristate "Marvell 88W8xxx PCI/PCIe Wireless support"
+ 	depends on MAC80211 && PCI

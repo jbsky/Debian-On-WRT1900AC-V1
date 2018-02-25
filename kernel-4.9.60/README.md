@@ -29,6 +29,8 @@
 * no netfilter
 * no vlan
 
+#### CONFIG_HIGHMEM disabled because the system has less than 1GB of RAM
+
 => mwlwifi : Change driver version to 10.3.0.18-20160823-1.<BR />
 https://github.com/kaloz/mwlwifi/archive/af606563453c819fac156faf2b15b9caef844329.zip
 

@@ -1,0 +1,44 @@
+#!/bin/bash
+VER=4.14.5
+
+# set Ip or FQDN of your router.
+WRT=wrt
+if [ -f linux-${VER}.tar.xz ];then
+	wget http://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${VER}.tar.xz
+fi
+tar xvfJ linux-${VER}.tar.xz
+rm linux
+ln -s linux-${VER} linux
+cd linux-${VER}/
+wget https://github.com/kaloz/mwlwifi/archive/master.zip
+unzip master
+rm master.zip
+mv mwlwifi-master/bin/firmware firmware/mwlwifi
+mv mwlwifi-master/Makefile.kernel mwlwifi-master/Makefile
+mv mwlwifi-master/ drivers/net/wireless/marvell/mwlwifi
+
+wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.12.9/mwlwifi.patch
+wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.12.9/add_mamba_powertables.patch
+wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.12.9/ability_to_change_the_signal_strength.patch
+patch -p0 < ../mwlwifi.patch
+patch -p1 < add_mamba_powertables.patch
+patch -p1 < ability_to_change_the_signal_strength.patch
+
+
+exit
+# make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 menuconfig # bypass
+
+make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 zImage
+make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 dtbs
+make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 modules
+
+mkdir modules
+make ARCH=arm CROSS_COMPILE=arm-none-eabi- INSTALL_MOD_PATH=modules modules_install
+
+cat arch/arm/boot/zImage arch/arm/boot/dts/armada-xp-linksys-mamba.dtb > ./zImage-linksys-mamba
+mkimage -A arm -O linux -T kernel -C none -a 0x100000 -e 0x100000 -n "Kernel ${VER}" -d ./zImage-linksys-mamba ./firmware-WRT1900AC-V1
+
+cd modules
+rm lib/modules/${VER}/source
+rm lib/modules/${VER}/build
+scp -r * ${WRT}:/

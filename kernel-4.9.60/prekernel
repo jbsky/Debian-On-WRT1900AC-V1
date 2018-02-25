@@ -1,9 +1,9 @@
 #!/bin/bash
-VER=4.9.60
+VER=4.9.61
 
 # set Ip or FQDN of your router.
 WRT=wrt
-#wget http://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${VER}.tar.xz
+wget http://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${VER}.tar.xz
 tar xvfJ linux-${VER}.tar.xz
 rm linux
 ln -s linux-${VER} linux
@@ -22,24 +22,8 @@ wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kerne
 patch -p0 < mwlwifi.patch
 patch -p1 < fan.patch
 patch -p1 < add_mamba_powertables.patch
-patch -p0 < ability_to_change_the_signal_strength.patch
+patch -p1 < ability_to_change_the_signal_strength.patch
 
-wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.12.9/.config
+wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.9.60/.config
 
 exit
-# make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 menuconfig # bypass
-
-make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 zImage
-make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 dtbs
-make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 modules
-
-mkdir modules
-make ARCH=arm CROSS_COMPILE=arm-none-eabi- INSTALL_MOD_PATH=modules modules_install
-
-cat arch/arm/boot/zImage arch/arm/boot/dts/armada-xp-linksys-mamba.dtb > ./zImage-linksys-mamba
-mkimage -A arm -O linux -T kernel -C none -a 0x100000 -e 0x100000 -n "Kernel ${VER}" -d ./zImage-linksys-mamba ./firmware-WRT1900AC-V1
-
-cd modules
-rm lib/modules/${VER}/source
-rm lib/modules/${VER}/build
-scp -r * ${WRT}:/

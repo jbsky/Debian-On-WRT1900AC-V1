@@ -1,0 +1,20 @@
+#!/bin/bash
+VER=4.14.5
+
+# set Ip or FQDN of your router.
+WRT=wrt
+
+make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 zImage
+make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 dtbs
+make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 modules
+
+mkdir modules
+make ARCH=arm CROSS_COMPILE=arm-none-eabi- INSTALL_MOD_PATH=modules modules_install
+
+cat arch/arm/boot/zImage arch/arm/boot/dts/armada-xp-linksys-mamba.dtb > ./zImage-linksys-mamba
+mkimage -A arm -O linux -T kernel -C none -a 0x100000 -e 0x100000 -n "Kernel ${VER}" -d ./zImage-linksys-mamba ./firmware-WRT1900AC-V1
+
+cd modules
+rm lib/modules/${VER}/source
+rm lib/modules/${VER}/build
+scp -r * ${WRT}:/
