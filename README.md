@@ -8,6 +8,7 @@
 * `wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.9.60/menu`<BR />
 * `chmod +x prekernel`<BR />
 * `chmod +x kernel`<BR />
+* `chmod +x menu`<BR />
 * Edit scripts to adjust vars.<BR />
 * `./prekernel`<BR />
 * `cd linux`<BR />
@@ -42,7 +43,9 @@ Tmin=50<BR />
 Tmax=80<BR />
 Vmax=255<BR />
 V=Vmax*(CurTemp-Tmin)/(Tmax-Tmin)<BR />
-Sea diagram : fancontrol.jpg<BR />
+Sea diagram : fancontrol.jpg
+![image](https://github.com/jbsky/Debian-On-WRT1900AC-V1/blob/master/fancontrol.jpg)
+<BR />
 
 ## Firewall
 Script is inspired from debian.org's forum.
