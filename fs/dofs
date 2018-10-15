@@ -1,8 +1,8 @@
 #!/bin/bash
 MACHINE=WRT1900AC
 ARCH=armhf
-DIR=/home/${MACHINE}
-DEPOT=http://ftp.debian.org/debian/
+DIR=~/${MACHINE}
+DEPOT=http://ftp.fr.debian.org/debian/
 CODE=jessie
 IP=192.168.0.1
 MASK=255.255.255.0
