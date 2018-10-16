@@ -1,9 +1,9 @@
 #!/bin/bash
-MACHINE=WRT1900AC
+MACHINE=wrt1900ac
 ARCH=armhf
 DIR=~/${MACHINE}
 DEPOT=http://ftp.fr.debian.org/debian/
-CODE=jessie
+CODE=stretch
 IP=192.168.0.1
 MASK=255.255.255.0
 GW=192.168.0.254
@@ -28,7 +28,7 @@ deb ${DEPOT} ${CODE}-updates main contrib non-free
 deb http://security.debian.org/debian-security ${CODE}/updates main contrib non-free
 FILE
 apt-get update
-apt-get install ca-certificates  locales localepurge dialog openssh-server ntpdate debconf -y
+apt-get install ca-certificates  locales localepurge dialog openssh-server ntpdate debconf bridge-utils iw hostapd vlan -y
 apt-get dist-upgrade -y
 cat << FILE >> /etc/network/interfaces
 allow-hotplug eth0
@@ -38,10 +38,10 @@ gateway ${GW}
 netmask ${MASK}
 FILE
 apt-get clean
+dpkg-reconfigure locales
+dpkg-reconfigure tzdata
 exit
 EOF
 chmod +x ${DIR}/${CODE}-${ARCH}/startup
 chroot ${DIR}/${CODE}-${ARCH} /startup
-echo "if you need :
-Pour configurer les variables LC   : dpkg-reconfigure locales
-Pour configurer la time zone Paris : dpkg-reconfigure tzdata"
+
