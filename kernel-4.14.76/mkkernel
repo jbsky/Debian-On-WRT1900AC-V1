@@ -1,0 +1,226 @@
+#!/bin/bash -x
+	VER=4.14.76
+	WRT=192.168.10.10
+	FW_LINUXNAME=arm_v7_${VER}.wrt1900ac.img
+	WORKINGDIR=.
+
+f_extract(){
+	if [ ! -f linux-${VER}.tar.xz ];then
+		wget http://cdn.kernel.org/pub/linux/kernel/v4.x/linux-${VER}.tar.xz
+	fi
+	tar xvfJ linux-${VER}.tar.xz
+	rm linux
+	ln -s linux-${VER} linux
+}
+f_moveto(){
+	cd ${WORKINGDIR}/linux-${VER}/
+}
+f_mwlwifi(){
+
+        ARCHIVE=master
+
+	#10.3.0.18-20160823-1
+#	ARCHIVE=af606563453c819fac156faf2b15b9caef844329
+
+	# 27 Jul 2017
+# 	ARCHIVE=3ca0ea1c201bab59c9d4c3941584e34a7acf0325
+
+	#  2 Nov 2017
+#	ARCHIVE=cbb631e06a7c3d88f3e5ad44cb56129278899252
+
+#       ARCHIVE=706bffbe2182711f8b0a3ec3bb272aea6939e272
+
+	# 12 May 2017
+ #       ARCHIVE=f8a3c794e04bb2134b590f58bc4788b390d0471e
+
+	# 26 May 2017
+#	ARCHIVE=b3d5924f039085fb86a13a606d8f4e9ed63c97a6
+
+	#  4 May 2017
+#	ARCHIVE=7e29d87ebb5ac82213a8b20677538cab5dafa20b stable au demarrage mais le lendemain moins perf
+
+
+
+
+        wget https://github.com/kaloz/mwlwifi/archive/${ARCHIVE}.zip
+        unzip ${ARCHIVE}.zip
+        rm ${ARCHIVE}
+
+        mv mwlwifi-${ARCHIVE}/bin/firmware firmware/mwlwifi
+        mv mwlwifi-${ARCHIVE}/Makefile.kernel mwlwifi-${ARCHIVE}/Makefile
+
+	if [ ! -f drivers/net/wireless/marvell/mwlwifi ];then
+		rm -Rf drivers/net/wireless/marvell/mwlwifi
+	fi
+
+        mv mwlwifi-${ARCHIVE} drivers/net/wireless/marvell/mwlwifi
+
+
+}
+
+f_patch(){
+        wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.14.21/mwlwifi.patch
+	wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.14.21/add_mamba_powertables.patch
+#	wget https://raw.githubusercontent.com/jbsky/Debian-On-WRT1900AC-V1/master/kernel-4.14.21/ability_to_change_the_signal_strength.patch
+	patch -p1 < add_mamba_powertables.patch
+	#patch -p1 < ability_to_change_the_signal_strength.patch
+        patch -p0 < ../mwlwifi.patch
+
+}
+f_config(){
+	cp arch/arm/configs/mvebu_v7_defconfig .config
+
+	echo "Adding IKConfig"
+	cat >> .config << EOF
+CONFIG_BUILD_BIN2C=y
+CONFIG_IKCONFIG=m
+CONFIG_IKCONFIG_PROC=y
+EOF
+
+	echo "Adding Cgroup"
+	cat >> .config << EOF
+CONFIG_CGROUPS=y"
+CONFIG_PAGE_COUNTER=y"
+CONFIG_MEMCG=y"
+CONFIG_MEMCG_SWAP=y"
+CONFIG_BLK_CGROUP=y"
+CONFIG_CGROUP_WRITEBACK=y"
+CONFIG_CGROUP_SCHED=y"
+CONFIG_FAIR_GROUP_SCHED=y"
+CONFIG_CGROUP_PIDS=y"
+CONFIG_CGROUP_RDMA=y"
+CONFIG_CGROUP_FREEZER=y"
+CONFIG_CGROUP_DEVICE=y"
+CONFIG_CGROUP_CPUACCT=y"
+CONFIG_CGROUP_PERF=y"
+EOF
+
+	echo "Adding Wireless MAC80211"
+	cat >> .config << EOF
+CONFIG_WEXT_CORE=y
+CONFIG_WEXT_PROC=y"
+CONFIG_CFG80211_CERTIFICATION_ONUS=y
+CONFIG_CFG80211_REG_RELAX_NO_IR=y
+CONFIG_CFG80211_WEXT=y
+CONFIG_MAC80211=y
+CONFIG_MAC80211_HAS_RC=y
+CONFIG_MAC80211_RC_MINSTREL=y
+CONFIG_MAC80211_RC_MINSTREL_HT=y
+CONFIG_MAC80211_RC_MINSTREL_VHT=y
+CONFIG_MAC80211_RC_DEFAULT_MINSTREL=y
+CONFIG_MAC80211_RC_DEFAULT="minstrel_ht"
+CONFIG_MAC80211_DEBUGFS=y
+CONFIG_MAC80211_MESH=y"
+CONFIG_MAC80211_LEDS=y"
+CONFIG_RTL_CARDS=y
+CONFIG_CRYPTO_GF128MUL=y
+CONFIG_CRYPTO_CCM=y
+CONFIG_CRYPTO_GCM=y
+CONFIG_CRYPTO_SEQIV=y
+CONFIG_CRYPTO_CTR=y
+CONFIG_CRYPTO_GHASH=y
+CONFIG_CRYPTO_ARC4=y
+CONFIG_MWLWIFI=m
+EOF
+
+
+	echo "Adding LED Support "
+	echo "CONFIG_LEDS_TLC591XX=y" >> .config
+	echo "CONFIG_USB_LEDS_TRIGGER_USBPORT=m" >> .config
+
+	echo "Adding Bonding support"
+	echo "CONFIG_BONDING=m" >> .config
+
+	echo "Adding networking protocols"
+	cat >> .config << EOF
+CONFIG_STP=m"
+CONFIG_BRIDGE=m"
+CONFIG_BRIDGE_IGMP_SNOOPING=y"
+CONFIG_VLAN_8021Q=m"
+CONFIG_LLC=m"
+CONFIG_BONDING=m"
+EOF
+
+	echo "Adding boot option protocols"
+	echo "CONFIG_CMDLINE=\"rootdelay=5 rootfstype=ext4 root=/dev/sda1 rw init=/sbin/init console=ttyS0,115200\"" >> .config
+	echo "CONFIG_CMDLINE_FORCE=y" >> .config
+
+	echo "Add Monitoring network"
+	echo "CONFIG_INET_UDP_DIAG=m"  >> .config
+	echo "CONFIG_INET_RAW_DIAG=m"  >> .config
+	echo "CONFIG_PACKET_DIAG=m"  >> .config
+	echo "CONFIG_UNIX_DIAG=m"  >> .config
+
+
+	echo "Add WDS capabilites"
+	echo "CONFIG_WIRELESS_WDS=y" >> .config
+
+	echo "Add TMP421 sensor"
+        echo "CONFIG_SENSORS_TMP421=y" >> .config
+
+	echo "Add file system support"
+	cat >> .config << EOF
+CONFIG_FS_POSIX_ACL=y
+CONFIG_AUTOFS4_FS=m
+CONFIG_FUSE_FS=m
+CONFIG_NTFS_FS=m
+EOF
+
+}
+
+f_menu(){
+	make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 menuconfig # bypass
+}
+f_remove(){
+	echo "Remove IPv6"
+	sed -i '/CONFIG_NET_IP_TUNNEL/d' .config
+	sed -i '/CONFIG_INET_TUNNEL/d' .config
+	sed -i '/CONFIG_IPV6/d' .config
+	sed -i '/CONFIG_INET6_XFRM_MODE_TRANSPORT/d' .config
+	sed -i '/CONFIG_INET6_XFRM_MODE_TUNNEL/d' .config
+	sed -i '/CONFIG_INET6_XFRM_MODE_BEET/d' .config
+	sed -i '/CONFIG_IPV6_SIT/d' .config
+	sed -i '/CONFIG_IPV6_NDISC_NODETYPE/d' .config
+	sed -i '/CONFIG_BT/d' .config
+	sed -i '/CONFIG_DST_CACHE/d' .config
+        echo "Remove GPIO Fan"
+        sed -i '/CONFIG_SENSORS_GPIO_FAN/d' .config
+	echo "Remove MWLWIFIEX"
+	sed -i '/CONFIG_MWIFIEX/d' .config
+	sed -i '/CONFIG_MWIFIEX_SDIO/d' .config
+	echo "Remove sound capabiliies"
+	sed -i '/CONFIG_SOUND/d' .config
+
+
+
+
+}
+f_compil(){
+	make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 zImage
+	make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 dtbs
+	make ARCH=arm CROSS_COMPILE=arm-none-eabi- -j16 modules
+
+	mkdir modules
+	make ARCH=arm CROSS_COMPILE=arm-none-eabi- INSTALL_MOD_PATH=modules modules_install
+
+	cat arch/arm/boot/zImage arch/arm/boot/dts/armada-xp-linksys-mamba.dtb > ./zImage-linksys-mamba
+	mkimage -A arm -O linux -T kernel -C none -a 0x100000 -e 0x100000 -n "Kernel ${VER}" -d ./zImage-linksys-mamba ./${FW_LINUXNAME}
+
+	cd modules
+	rm lib/modules/${VER}/source
+	rm lib/modules/${VER}/build
+}
+f_upload(){
+	scp -r * ${WRT}:/
+}
+
+f_extract
+f_moveto
+f_mwlwifi
+f_patch
+f_config
+f_menu
+f_remove
+f_compil
+f_upload
+
